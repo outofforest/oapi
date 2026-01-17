@@ -17,6 +17,8 @@ type ImportMapping map[string]string
 
 // Configuration is the config for generator.
 type Configuration struct {
+	SpecFile       string
+	OutputFile     string
 	ImportMapping  ImportMapping
 	GenerateServer bool
 	GenerateClient bool
@@ -24,14 +26,19 @@ type Configuration struct {
 }
 
 // Generate generates code from OpenAPI spec file.
-func Generate(specFile, outputFile string, cfg Configuration) {
+func Generate(configs ...Configuration) {
 	run.New().Run(context.Background(), "generator", func(ctx context.Context) error {
-		return generate(specFile, outputFile, cfg)
+		for _, cfg := range configs {
+			if err := generate(cfg); err != nil {
+				return err
+			}
+		}
+		return nil
 	})
 }
 
-func generate(specFile, outputFile string, cfg Configuration) error {
-	absDir, err := filepath.Abs(filepath.Dir(outputFile))
+func generate(cfg Configuration) error {
+	absDir, err := filepath.Abs(filepath.Dir(cfg.OutputFile))
 	if err != nil {
 		return err
 	}
@@ -58,7 +65,7 @@ func generate(specFile, outputFile string, cfg Configuration) error {
 		return errors.WithStack(err)
 	}
 
-	swagger, err := util.LoadSwagger(specFile)
+	swagger, err := util.LoadSwagger(cfg.SpecFile)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -71,5 +78,5 @@ func generate(specFile, outputFile string, cfg Configuration) error {
 		return errors.WithStack(err)
 	}
 
-	return errors.WithStack(os.WriteFile(outputFile, []byte(code), 0o644))
+	return errors.WithStack(os.WriteFile(cfg.OutputFile, []byte(code), 0o600))
 }
