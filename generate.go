@@ -63,6 +63,9 @@ func generate(specFile, outputFile string, cfg Configuration) error {
 		return errors.WithStack(err)
 	}
 
+	if err := os.MkdirAll(absDir, 0o700); err != nil {
+		return errors.WithStack(err)
+	}
 	code, err := codegen.Generate(swagger, opts)
 	if err != nil {
 		return errors.WithStack(err)
