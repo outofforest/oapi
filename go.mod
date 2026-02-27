@@ -3,7 +3,7 @@ module github.com/outofforest/oapi
 go 1.25
 
 require (
-	github.com/oapi-codegen/oapi-codegen/v2 v2.5.1
+	github.com/oapi-codegen/oapi-codegen/v2 v2.6.0
 	github.com/outofforest/run v0.8.0
 	github.com/pkg/errors v0.9.1
 )
